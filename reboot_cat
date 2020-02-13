@@ -1,0 +1,12 @@
+#!/bin/sh
+ip='192.168.1.1'#光猫ip
+user='useradmin'#光猫账号
+pass='2LA5s05x' #光猫密码
+
+cookie=`curl -d "username=$user&psd=$pass" http://$ip/cgi-bin/luci -v 2>&1 | grep "< Set-Cookie:" | awk '{print $3}'`
+
+token=`curl --cookie "$cookie" http://$ip/cgi-bin/luci/ 2>&1 | grep "data: { token: '" | awk '{print $9}' | cut -c 2-`
+
+curl -d "token=${token%%\'*}" --cookie "$cookie" http://$ip/cgi-bin/luci/admin/reboot -v
+
+return 0
